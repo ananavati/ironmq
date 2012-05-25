@@ -73,7 +73,7 @@ var IronWorker = module.exports = function (token, op)
 
 			// path to use for http message operations
 			// at the task specific level
-			var taskPath = tasksPath + task_id;
+			var taskPath = tasksPath + "/" + task_id;
 
 			// object to return
 			var task =
@@ -112,14 +112,19 @@ var IronWorker = module.exports = function (token, op)
 			{
 				var url = taskPath + "/cancel";
 
-				ironWorkerGet(url, null, cb);
+				ironWorkerPostSimple(url, null, cb);
 			}
 
-			function taskProgress(cb)
+			function taskProgress(percent,msg,cb)
 			{
 				var url = taskPath + "/progress";
 
-				ironWorkerGet(url, null, cb);
+				var progress = {
+					"percent": percent,
+					"msg": msg
+				};
+
+				ironWorkerPost(url, progress, cb);
 			}
 
 			function id()
