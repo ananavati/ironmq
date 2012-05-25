@@ -96,3 +96,19 @@ Queue Information
     project.queues('my_queue', function(err, queue) {})
 
     project('my_queue', function(err, queue) {})
+
+Branching and Running the Tests
+================================
+
+<root-dir>
+  /iron-mq-branch
+  /node-modules
+
+cd <root-dir>
+npm install tap
+npm install nock
+npm install require
+
+Running the tests:
+
+node node-modules/tap/bin/tap.js iron-mq-branch/tests/*.js
