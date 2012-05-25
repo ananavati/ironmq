@@ -40,9 +40,9 @@ var IronWorker = module.exports = function (token, op)
 							 });
 
 	var client = {
-		listProjects: listProjects
+		listProjects: listProjects,
+		projects: projects
 	};
-	client.projects = projects;
 
 	return client;
 
@@ -52,21 +52,27 @@ var IronWorker = module.exports = function (token, op)
 	function projects(project_id)
 	{
 		var tasksPath = '/projects/' + project_id + '/tasks';
+		var scheduledTasksPath = '/projects/' + project_id + '/schedules';
 
-		var project =
-		{
+		var project = {
 			id: id,
 			listTasks: listTasks,
 			queueTask: queueTask,
-			hookTask: hookTask
+			hookTask: hookTask,
+			tasks: tasks,
+			listScheduledTasks: listScheduledTasks,
+			scheduleTask: scheduleTask,
+			scheduledTasks: scheduledTasks
 		};
-
-		// little sugar
-		project.tasks = tasks;
 
 		return project;
 
 		// Implementation
+
+		function id()
+		{
+			return project_id;
+		}
 
 		function tasks(task_id, cb)
 		{
@@ -130,6 +136,46 @@ var IronWorker = module.exports = function (token, op)
 			function id()
 			{
 				return task_id;
+			}
+		}
+
+		function scheduledTasks(schedule_id, cb)
+		{
+			var scheduledTaskPath = scheduledTasksPath + "/" + schedule_id;
+
+			var schedule =
+			{
+				info:    scheduleInfo,
+				cancel:  scheduleCancel,
+				id:      id
+			};
+
+			if (typeof cb === 'function')
+			{
+				schedule.info(cb)
+			}
+
+			return schedule;
+
+			//Implementation
+
+			function id()
+			{
+				return schedule_id;
+			}
+
+			function scheduleInfo(cb)
+			{
+				var url = scheduledTaskPath;
+
+				ironWorkerGet(url, null, cb)
+			}
+
+			function scheduleCancel(cb)
+			{
+				var url = scheduledTaskPath + "/cancel";
+
+				ironWorkerPostSimple(url, null, cb);
 			}
 		}
 
@@ -218,9 +264,71 @@ var IronWorker = module.exports = function (token, op)
 			ironWorkerPostSimple(url, payload, cb);
 		}
 
-		function id()
+		function listScheduledTasks(pageIndex, perPage, cb)
 		{
-			return project_id;
+			if (typeof pageIndex === 'function')
+			{
+				cb = pageIndex;
+				pageIndex = 0;
+				perPage = 0;
+			}
+			else if (typeof perPage === 'function')
+			{
+				cb = perPage;
+				perPage = 0;
+			}
+
+			var url = scheduledTasksPath;
+			var params = {
+				page:    pageIndex,
+				per_page:perPage
+			};
+
+			ironWorkerGet(url, params, function (err, obj)
+			{
+				if (!err)
+				{
+					obj = obj.schedules.map(function(schedule) {
+						var tmp = scheduledTasks(schedule.id);
+						return tmp;
+					});
+				}
+
+				cb(err, obj);
+			});
+		}
+
+		function scheduleTask(codeName, payload, properties, cb)
+		{
+			if (typeof properties === 'function')
+			{
+				cb = properties;
+				properties = null;
+			}
+
+			var url = scheduledTasksPath;
+			var schedule = {
+				"code_name": codeName,
+				"payload": payload
+			};
+
+			// merge in extra provided params
+			if (properties !== null)
+			{
+				var keys = Object.keys(properties);
+				var numKeys = keys.length;
+
+				for (var i = 0; i<numKeys; i++)
+				{
+					schedule[keys[i]] = properties[keys[i]];
+				}
+			}
+
+			var params = {
+				"schedules" : [schedule]
+			};
+
+			ironWorkerPost(url, params, cb);
 		}
 	}
 

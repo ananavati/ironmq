@@ -28,7 +28,7 @@ if (con.proxy)
 			msg : "Queued up",
 			tasks: [
 				{
-					"id": "4eb1b471cddb136065000010"
+					"id": taskId
 				}
 			]
 		},{
@@ -48,7 +48,7 @@ test('tasks.post(str,str,int,int,int, func)', function(t)
 						msg: "Queued up",
 						tasks: [
 							{
-								"id": "4eb1b471cddb136065000010"
+								"id": taskId
 							}
 						]
 					});

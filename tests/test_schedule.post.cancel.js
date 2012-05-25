@@ -15,34 +15,27 @@ if (con.proxy)
 		.matchHeader('content-type','application/json')
 		.matchHeader('user-agent',con.ironWorkerUserAgent)
 		.post(
-		'/2/projects/' + projectId + '/tasks/webhook?code_name=testCode'
-		, "testPayload")
+		'/2/projects/' + projectId + '/schedules/' + taskId + "/cancel")
 		.reply(200
 		, {
-			msg : "Queued up",
-			id: taskId
+			msg : "Cancelled"
 		},{
 		   "content-type" : 'application/json'
 	   });
 }
 
-test('tasks.post(str,str,int,int,int, func)', function(t)
+test('scheduledTask.cancel(func)', function(t)
 {
 	var client = ironWorker(token);
 	var project  = client.projects(projectId);
+	var scheduledTask = project.scheduledTasks(taskId);
 
-	project.hookTask('testCode',"testPayload", function(err, obj)
+	scheduledTask.cancel(function(err, obj)
 	{
 		t.deepEqual(obj,
 					{
-						msg: "Queued up",
-						id: taskId
+						msg: "Cancelled"
 					});
 		t.end();
 	});
 });
-
-
-//TODO
-// msg, not object, cb -> throw error
-
