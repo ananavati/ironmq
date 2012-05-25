@@ -87,6 +87,7 @@ function assertIsProject(t,project)
 	t.ok(typeof project.id === 'function');
 	t.ok(typeof project.listTasks === 'function');
 	t.ok(typeof project.queueTask === 'function');
+	t.ok(typeof project.hookTask === 'function');
 	t.ok(typeof project.tasks === 'function');
 }
 

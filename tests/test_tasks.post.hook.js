@@ -15,22 +15,12 @@ if (con.proxy)
 		.matchHeader('content-type','application/json')
 		.matchHeader('user-agent',con.ironWorkerUserAgent)
 		.post(
-		'/2/projects/' + projectId + '/tasks'
-		, { tasks : [
-				{
-					"code_name": "testCode",
-					"payload": "testPayload"
-				}
-			]
-		})
+		'/2/projects/' + projectId + '/tasks/webhook?code_name=testCode'
+		, "testPayload")
 		.reply(200
 		, {
 			msg : "Queued up",
-			tasks: [
-				{
-					"id": "4eb1b471cddb136065000010"
-				}
-			]
+			id: "4eb1b471cddb136065000010"
 		},{
 		   "content-type" : 'application/json'
 	   });
@@ -41,16 +31,12 @@ test('tasks.post(str,str,int,int,int, func)', function(t)
 	var client = ironWorker(token);
 	var project  = client.projects(projectId);
 
-	project.queueTask('testCode',"testPayload", function(err, obj)
+	project.hookTask('testCode',"testPayload", function(err, obj)
 	{
 		t.deepEqual(obj,
 					{
 						msg: "Queued up",
-						tasks: [
-							{
-								"id": "4eb1b471cddb136065000010"
-							}
-						]
+						id: "4eb1b471cddb136065000010"
 					});
 		t.end();
 	});

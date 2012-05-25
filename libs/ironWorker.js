@@ -57,7 +57,8 @@ var IronWorker = module.exports = function (token, op)
 		{
 			id: id,
 			listTasks: listTasks,
-			queueTask: queueTask
+			queueTask: queueTask,
+			hookTask: hookTask
 		};
 
 		// little sugar
@@ -205,6 +206,13 @@ var IronWorker = module.exports = function (token, op)
 			ironWorkerPost(url, params, cb);
 		}
 
+		function hookTask(codeName, payload, cb)
+		{
+			var url = tasksPath + "/webhook?code_name=" + codeName;
+
+			ironWorkerPostSimple(url, payload, cb);
+		}
+
 		function id()
 		{
 			return project_id;
@@ -252,9 +260,16 @@ var IronWorker = module.exports = function (token, op)
 
 	function ironWorkerPost(path, body, cb)
 	{
+		var jsonBody = JSON.stringify(body);
+
+		ironWorkerPostSimple(path,jsonBody,cb);
+	}
+
+	function ironWorkerPostSimple(path, body, cb)
+	{
 		request.post({ url:baseUrl + path, headers:headers}
 			, parseResponse(cb))
-			.end(JSON.stringify(body));
+			.end(body);
 	}
 
 	function ironWorkerDel(path, cb)
