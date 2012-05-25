@@ -39,18 +39,34 @@ var IronWorker = module.exports = function (token, op)
 								 pathname:'/' + api_ver
 							 });
 
-	/**
-	 *  Curry the project_id
-	 */
+	var client = {
+		listProjects: listProjects
+	};
+	client.projects = projects;
+
+	return client;
+
+
+	// Implementation
+
 	function projects(project_id)
 	{
 		var tasksPath = '/projects/' + project_id + '/tasks';
 
-		/**
-		 *  Curry the task_id
-		 *  cb is a function.  Passing it is short hand for
-		 *  tasks(task_id).info(cb)
-		 */
+		var project =
+		{
+			id: id,
+			listTasks: listTasks,
+			queueTask: queueTask
+		};
+
+		// little sugar
+		project.tasks = tasks;
+
+		return project;
+
+		// Implementation
+
 		function tasks(task_id, cb)
 		{
 
@@ -65,10 +81,7 @@ var IronWorker = module.exports = function (token, op)
 				log:     taskLog,
 				cancel:  taskCancel,
 				progress:taskProgress,
-				id:      function ()
-				{
-					return task_id
-				}
+				id:      id
 			};
 
 			if (typeof cb === 'function')
@@ -107,12 +120,14 @@ var IronWorker = module.exports = function (token, op)
 
 				ironWorkerGet(url, null, cb);
 			}
+
+			function id()
+			{
+				return task_id;
+			}
 		}
 
-		/**
-		 *  Returns a array of tasks for a given project
-		 */
-		tasks.list = function listTasks(pageIndex, perPage, cb)
+		function listTasks(pageIndex, perPage, cb)
 		{
 			if (typeof pageIndex === 'function')
 			{
@@ -145,23 +160,58 @@ var IronWorker = module.exports = function (token, op)
 
 				cb(err, obj);
 			});
-		};
+		}
 
-		tasks.id = function ()
+		function queueTask(codeName, payload, priority, timeout, delay, cb)
+		{
+			if (typeof priority === 'function')
+			{
+				cb = priority;
+				priority = null;
+				timeout = null;
+				delay = null;
+			}
+			else if (typeof timeout === 'function')
+			{
+				cb = timeout;
+				timeout = null;
+				delay = null;
+			}
+			else if (typeof delay === 'function')
+			{
+				cb = timeout;
+				delay = null;
+			}
+
+			var url = tasksPath;
+			var task = {
+				"code_name": codeName,
+				"payload": payload
+			};
+
+			if (priority !== null)
+				task.priority = priority;
+
+			if (timeout !== null)
+				task.priority = timeout;
+
+			if (delay !== null)
+				task.priority = delay;
+
+			var params = {
+				"tasks" : [task]
+			};
+
+			ironWorkerPost(url, params, cb);
+		}
+
+		function id()
 		{
 			return project_id;
-		};
-
-		// little sugar
-		tasks.tasks = tasks;
-
-		return tasks;
+		}
 	}
 
-	/*
-	 *  Returns an array of projects for a given token
-	 */
-	projects.list = function listProjects(cb)
+	function listProjects(cb)
 	{
 		ironWorkerGet('/projects'
 			, {}
@@ -169,18 +219,13 @@ var IronWorker = module.exports = function (token, op)
 			{
 				if (!err) {
 					obj = obj.projects.map(function(project) {
-						return IronWorker(token)(project.id);
+						return IronWorker(token).projects(project.id);
 					});
 				}
 
 				cb(err, obj);
 			});
-	};
-
-	// little sugar
-	projects.projects = projects;
-
-	return projects;
+	}
 
 	//Transport implementation
 
@@ -205,7 +250,7 @@ var IronWorker = module.exports = function (token, op)
 			.end();
 	}
 
-	function ironWorkerPut(path, body, cb)
+	function ironWorkerPost(path, body, cb)
 	{
 		request.post({ url:baseUrl + path, headers:headers}
 			, parseResponse(cb))
