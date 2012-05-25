@@ -1,11 +1,11 @@
-var ironmq  = require('../').IronMQ;
+var ironmq  = require('../')
 
 var nock    = require('nock')
 var test    = require('tap').test
 
 var con     = require('./constants.js')
 var token   = con.token
-var project = con.projectId
+var project = con.project
 var q_name  = con.queue
 
 test('queues', function(t) {

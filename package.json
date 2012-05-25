@@ -1,17 +1,8 @@
 {
   "name": "ironmq",
   "description": "ironMQ bindings for node",
-  "version": "0.1.5",
-  "contributors": [
-    {
-      "name":"ryan emery",
-      "email":"seebees@gmail.com"
-    },
-    {
-      "name":"ariel jakobovits",
-      "email":"arieljake@yahoo.com"
-    }
-                  ],
+  "version": "0.1.4",
+  "author": "ryan emery <seebees@gmail.com>",
   "main": "./libs/index.js",
   "engines": {
     "node": ">= 0.3.6"
@@ -28,6 +19,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/arieljake/ironmq.git"
+    "url": "git://github.com/seebees/ironmq.git"
   }
 }
