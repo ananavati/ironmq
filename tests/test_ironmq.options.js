@@ -9,16 +9,22 @@ var proj_id = con.projectId
 var q_name  = con.q_name
 
 if (con.proxy) {
-  var req = nock('http://host.name')
+  var req = nock('http://host.name:443')
     .matchHeader('authorization','OAuth ' + token)
     .matchHeader('content-type','application/json')
     .matchHeader('user-agent','IronMQ Node Client')
     .get(
       '/3/projects/' + proj_id + '/queues')
     .reply(200
-        ,[{ Timestamper   : {updated_at: 1327083607064000000 }
-          , project_id    : 'test_worked'
-          , name          : 'test_worked'}])
+        ,[
+		  {
+			Timestamper   : {
+				updated_at: 1327083607064000000
+			},
+         	project_id    : 'test_worked',
+          	name          : 'test_worked'
+		  }
+	  ]);
 }
 
 

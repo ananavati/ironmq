@@ -53,42 +53,42 @@ var IronWorker = module.exports = function (token, op)
 	{
 		var tasksPath = '/projects/' + project_id + '/tasks';
 		var scheduledTasksPath = '/projects/' + project_id + '/schedules';
+		var codePackagesPath = '/projects/' + project_id + '/codes';
 
 		var project = {
-			id: id,
+			id: function () { return project_id; },
+
+			// tasks
 			listTasks: listTasks,
 			queueTask: queueTask,
 			hookTask: hookTask,
 			tasks: tasks,
+
+			// scheduled tasks
 			listScheduledTasks: listScheduledTasks,
 			scheduleTask: scheduleTask,
-			scheduledTasks: scheduledTasks
+			scheduledTasks: scheduledTasks,
+
+			// code packages
+			listCodePackages: listCodePackages,
+			codePackages: codePackages
 		};
 
 		return project;
 
 		// Implementation
 
-		function id()
-		{
-			return project_id;
-		}
-
 		function tasks(task_id, cb)
 		{
-
-			// path to use for http message operations
-			// at the task specific level
 			var taskPath = tasksPath + "/" + task_id;
 
-			// object to return
 			var task =
 			{
+				id:      function () { return task_id; },
 				info:    taskInfo,
 				log:     taskLog,
 				cancel:  taskCancel,
-				progress:taskProgress,
-				id:      id
+				progress:taskProgress
 			};
 
 			if (typeof cb === 'function')
@@ -132,11 +132,6 @@ var IronWorker = module.exports = function (token, op)
 
 				ironWorkerPost(url, progress, cb);
 			}
-
-			function id()
-			{
-				return task_id;
-			}
 		}
 
 		function scheduledTasks(schedule_id, cb)
@@ -145,9 +140,9 @@ var IronWorker = module.exports = function (token, op)
 
 			var schedule =
 			{
+				id:      function () { return schedule_id; },
 				info:    scheduleInfo,
-				cancel:  scheduleCancel,
-				id:      id
+				cancel:  scheduleCancel
 			};
 
 			if (typeof cb === 'function')
@@ -158,11 +153,6 @@ var IronWorker = module.exports = function (token, op)
 			return schedule;
 
 			//Implementation
-
-			function id()
-			{
-				return schedule_id;
-			}
 
 			function scheduleInfo(cb)
 			{
@@ -179,25 +169,106 @@ var IronWorker = module.exports = function (token, op)
 			}
 		}
 
+		function codePackages(code_id, cb)
+		{
+			var codePackagePath = codePackagesPath + "/" + code_id;
+
+			var codePackage =
+			{
+				id:      	function id() { return code_id; },
+				info:    	codePackageInfo,
+				delete:  	codePackageDelete,
+				download: 	codePackageDownload,
+				revisions: 	codePackageRevisions
+			};
+
+			if (typeof cb === 'function')
+			{
+				codePackage.info(cb)
+			}
+
+			return codePackage;
+
+			//Implementation
+
+			function codePackageInfo(cb)
+			{
+				var url = codePackagePath;
+
+				ironWorkerGet(url, null, cb)
+			}
+
+			function codePackageDelete(cb)
+			{
+				var url = codePackagePath;
+
+				ironWorkerDel(url, cb)
+			}
+
+			function codePackageDownload(cb)
+			{
+				var url = codePackagePath + "/download";
+
+				ironWorkerGet(url, null, cb);
+			}
+
+			function codePackageRevisions(pageIndex,perPage,cb)
+			{
+				if (typeof pageIndex === 'function')
+				{
+					cb = pageIndex;
+					pageIndex = null;
+					perPage = null;
+				}
+				else if (typeof perPage === 'function')
+				{
+					cb = perPage;
+					perPage = null;
+				}
+
+				var url = codePackagePath + "/revisions";
+				var params = {};
+
+				if (pageIndex !== null)
+					params.page = pageIndex;
+
+				if (perPage !== null)
+					params.per_page = perPage;
+
+				ironWorkerGet(url, params, function (err, obj)
+				{
+					if (!err)
+					{
+						obj = obj.revisions;
+					}
+
+					cb(err, obj);
+				});
+			}
+		}
+
 		function listTasks(pageIndex, perPage, cb)
 		{
 			if (typeof pageIndex === 'function')
 			{
 				cb = pageIndex;
-				pageIndex = 0;
-				perPage = 0;
+				pageIndex = null;
+				perPage = null;
 			}
 			else if (typeof perPage === 'function')
 			{
 				cb = perPage;
-				perPage = 0;
+				perPage = null;
 			}
 
 			var url = tasksPath;
-			var params = {
-				page:    pageIndex,
-				per_page:perPage
-			};
+			var params = {};
+
+			if (pageIndex !== null)
+				params.page = pageIndex;
+
+			if (perPage !== null)
+				params.per_page = perPage;
 
 			ironWorkerGet(url, params, function (err, obj)
 			{
@@ -269,20 +340,23 @@ var IronWorker = module.exports = function (token, op)
 			if (typeof pageIndex === 'function')
 			{
 				cb = pageIndex;
-				pageIndex = 0;
-				perPage = 0;
+				pageIndex = null;
+				perPage = null;
 			}
 			else if (typeof perPage === 'function')
 			{
 				cb = perPage;
-				perPage = 0;
+				perPage = null;
 			}
 
 			var url = scheduledTasksPath;
-			var params = {
-				page:    pageIndex,
-				per_page:perPage
-			};
+			var params = {};
+
+			if (pageIndex !== null)
+				params.page = pageIndex;
+
+			if (perPage !== null)
+				params.per_page = perPage;
 
 			ironWorkerGet(url, params, function (err, obj)
 			{
@@ -329,6 +403,43 @@ var IronWorker = module.exports = function (token, op)
 			};
 
 			ironWorkerPost(url, params, cb);
+		}
+
+		function listCodePackages(pageIndex, perPage, cb)
+		{
+			if (typeof pageIndex === 'function')
+			{
+				cb = pageIndex;
+				pageIndex = null;
+				perPage = null;
+			}
+			else if (typeof perPage === 'function')
+			{
+				cb = perPage;
+				perPage = null;
+			}
+
+			var url = codePackagesPath;
+			var params = {};
+
+			if (pageIndex !== null)
+				params.page = pageIndex;
+
+			if (perPage !== null)
+				params.per_page = perPage;
+
+			ironWorkerGet(url, params, function (err, obj)
+			{
+				if (!err)
+				{
+					obj = obj.codes.map(function(codePackage) {
+						var tmp = codePackages(codePackage.id);
+						return tmp;
+					});
+				}
+
+				cb(err, obj);
+			});
 		}
 	}
 

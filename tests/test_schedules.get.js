@@ -56,7 +56,7 @@ test('scheduledTasks.list', function(t)
 	var client = ironWorker(token);
 	var project = client.projects(projectId);
 
-	project.listScheduledTasks(function(err, obj)
+	project.listScheduledTasks(0,0,function(err, obj)
 	{
 		if (con.proxy)
 		{

@@ -43,7 +43,7 @@ test('tasks.list', function(t)
 	var client = ironWorker(token);
 	var project = client.projects(projectId);
 
-	project.listTasks(function(err, obj)
+	project.listTasks(0,0,function(err, obj)
 	{
 		if (con.proxy)
 		{
