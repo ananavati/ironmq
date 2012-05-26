@@ -27,7 +27,7 @@ The Basics
         	}	
         });
         
-  Note: the projects returned in the callback are project objects, on which you can make project API calls
+  Note: the projects returned in the callback are objects on which you can make API calls
 
 **List** tasks in a project:
 
@@ -41,7 +41,35 @@ The Basics
         	}	
         });
         
-  Note: the tasks returned in the callback are task objects, on which you can make task API calls
+  Note: the tasks returned in the callback are objects on which you can make API calls
+
+**List** scheduled tasks in a project:
+
+	var ironWorker = require('ironmq').IronWorker;
+  	ironWorker('token')
+  		.projects('project_id')
+  		.listScheduledTasks(function callBack(err, scheduledTasks) {
+			tasks.forEach(function (scheduledTask)
+        	{
+            	console.log(scheduledTask.id());
+        	}	
+        });
+
+  Note: the scheduled tasks returned in the callback are objects on which you can make API calls
+
+**List** code packages in a project:
+
+	var ironWorker = require('ironmq').IronWorker;
+  	ironWorker('token')
+  		.projects('project_id')
+  		.listCodePackages(function callBack(err, codePackages) {
+			tasks.forEach(function (codePackage)
+        	{
+            	console.log(codePackage.id());
+        	}	
+        });
+
+  Note: the code packages returned in the callback are objects on which you can make API calls
 
 **Queue** a task:
 
@@ -61,6 +89,16 @@ The Basics
   		.hookTask('code_name', 'payload', function (err,obj) 
   		{
   			assertTrue(obj.msg == "Queued up");
+  		});
+  		
+**Schedule** a task:
+
+	var ironWorker = require('ironmq').IronWorker;
+  	ironWorker('token')
+  		.projects('project_id')
+  		.scheduleTask('code_name', 'payload', properties, function (err,obj) 
+  		{
+  			assertTrue(obj.msg == "Scheduled");
   		});
 
 **Get** info about a task:
@@ -82,6 +120,28 @@ The Basics
 			console.log(obj.end_time);
 			console.log(obj.duration);
 			console.log(obj.timeout);
+  		});
+
+**Get** info about a scheduled task:
+
+    var ironWorker = require('ironmq').IronWorker;
+  	ironWorker('token')
+  		.projects('project_id')
+  		.scheduledTasks('task_id')
+  		.info(function (err,obj) 
+  		{
+  			console.dir(obj); // I am tired and don't feel like writing out all the properties :)
+  		});
+  		
+**Get** info about a code package:
+
+    var ironWorker = require('ironmq').IronWorker;
+  	ironWorker('token')
+  		.projects('project_id')
+  		.codePackages('code_id')
+  		.info(function (err,obj) 
+  		{
+  			console.dir(obj);
   		});
 
 **Get** a task's log:
@@ -106,6 +166,17 @@ The Basics
   			assertTrue(obj.msg == "Cancelled");
   		});
   		
+**Cancel** a scheduled task:
+
+    var ironWorker = require('ironmq').IronWorker;
+  	ironWorker('token')
+  		.projects('project_id')
+  		.scheduledTasks('task_id')
+  		.cancel(function (err,obj) 
+  		{
+  			assertTrue(obj.msg == "Cancelled");
+  		});
+  		
 **Set Progress** on a task:
 
     var ironWorker = require('ironmq').IronWorker;
@@ -116,7 +187,29 @@ The Basics
   		{
   			assertTrue(obj.msg == "Progress Set");
   		});
-    
+  		
+**Delete** a code package:
+
+    var ironWorker = require('ironmq').IronWorker;
+  	ironWorker('token')
+  		.projects('project_id')
+  		.codePackages('code_id')
+  		.delete(function (err,obj) 
+  		{
+  			assertTrue(obj.msg == "Deleted");
+  		});    
+
+**Download** a code package:
+
+    var ironWorker = require('ironmq').IronWorker;
+  	ironWorker('token')
+  		.projects('project_id')
+  		.codePackages('code_id')
+  		.download(function (err,obj) 
+  		{
+  			fs.writeFile("myFile.zip",obj); // I think, haven't tried it yet.
+  		});
+
 
 IronMQ Node Client
 -------------
