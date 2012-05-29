@@ -66,7 +66,7 @@ var IronCache = module.exports = function (token, op)
 			{
 				if (!err)
 				{
-					obj = obj.codes.map(function(cache) {
+					obj = obj.map(function(cache) {
 						var tmp = caches(cache.name);
 						return tmp;
 					});
@@ -84,7 +84,7 @@ var IronCache = module.exports = function (token, op)
 			{
 				id:      	function () { return cache_name; },
 				put:    	cachePut,
-				inc:     	cacheIncrement,
+				inc:     	cacheInc,
 				get:  		cacheGet,
 				delete:		cacheDelete
 			};
@@ -133,7 +133,7 @@ var IronCache = module.exports = function (token, op)
 				ironCachePut(url, params, cb);
 			}
 
-			function cacheIncrement(key,amount,cb)
+			function cacheInc(key,amount,cb)
 			{
 				var url = cachePath + "/items/" + key + "/increment";
 				var params = {

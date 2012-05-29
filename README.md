@@ -13,7 +13,7 @@ You can get your `token` and `project_id` at http://www.iron.io .
 The reference IronWorker's REST/HTTP API is here:
 http://dev.iron.io/worker/reference/api/
 
-The Basics
+IronWorker
 =========
 
 **List** your account's projects:
@@ -209,6 +209,64 @@ The Basics
   		{
   			fs.writeFile("myFile.zip",obj); // I think, haven't tried it yet.
   		});
+
+IronCache
+=========
+
+**List** your project's caches:
+
+  	var ironCache = require('ironmq').IronCache;
+  	ironCache('token')
+  	  .projects('project_id')
+  		.listCaches(function callBack(err, caches) {
+			caches.forEach(function (cache)
+            {
+            	console.log(cache.id());
+        	}
+        });
+
+  Note: the caches returned in the callback are objects on which you can make API calls
+
+**Add** an item to a cache:
+
+    var ironCache = require('ironmq').IronCache;
+    ironCache('token')
+      .projects('project_id')
+      .caches('cache_name')
+      .put(key,val,expires_in,replace,add,function callBack(err, obj) {
+        assertTrue(obj.msg == "Stored.");
+      });
+
+**Get** an item from a cache:
+
+    var ironCache = require('ironmq').IronCache;
+    ironCache('token')
+      .projects('project_id')
+      .caches('cache_name')
+      .get(key,function callBack(err, obj) {
+        console.log("cur val: " + obj.value);
+      });
+
+**Increment** an item's value:
+
+    var ironCache = require('ironmq').IronCache;
+    ironCache('token')
+      .projects('project_id')
+      .caches('cache_name')
+      .inc(key,amount,function callBack(err, obj) {
+        assertTrue(obj.msg == "Added");
+        console.log("new val: " + obj.value);
+      });
+
+**Delete** an item from a cache:
+
+    var ironCache = require('ironmq').IronCache;
+    ironCache('token')
+      .projects('project_id')
+      .caches('cache_name')
+      .del(key,function callBack(err, obj) {
+        assertTrue(obj.msg == "Deleted");
+      });
 
 
 IronMQ Node Client
