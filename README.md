@@ -269,21 +269,8 @@ IronCache
       });
 
 
-IronMQ Node Client
--------------
-
-Getting Started
-==============
-
-Install:
-
-    npm install ironmq
-
-You can get your `token` and `project_id` at http://www.iron.io .
-Queues are created on the fly as you ask for them.
-
-The Basics
-=========
+IronMQ
+======
 
 **Put** a message on a queue:
 
@@ -328,7 +315,7 @@ a timeout if you don't delete it (default timeout is 10 minutes).
 Delete a message from the queue when you're done with it.
 
 Project Selection
-===============
+-----------------
 
     // list projects
     var ironmq = require('ironmq')
@@ -344,7 +331,7 @@ Project Selection
     var project = ironmq('token')('project_id')
 
 Queue Selection
-===============
+---------------
 
 Similar to project selection, any of the following:
 
@@ -353,7 +340,7 @@ Similar to project selection, any of the following:
 1. `var queue = project('mq_queue')`
 
 Queue Information
-=================
+-----------------
 
     queue.info(function(err, obj) {
       obj.size    // number of msg's in this queue
@@ -370,7 +357,7 @@ Queue Information
 
 
 Branching and Running the Tests
--------------------------------
+===============================
 
 <root-dir>
   /iron-mq-branch
