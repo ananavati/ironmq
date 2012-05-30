@@ -86,7 +86,7 @@ var IronCache = module.exports = function (token, op)
 				put:    	cachePut,
 				inc:     	cacheInc,
 				get:  		cacheGet,
-				delete:		cacheDelete
+				del:		cacheDelete
 			};
 
 			return cache;

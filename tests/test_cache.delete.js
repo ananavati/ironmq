@@ -31,7 +31,7 @@ test('code.delete', function(t)
 	var project = client.projects(projectId);
 	var cache = project.caches(cacheName);
 
-	cache.delete(cacheKey,function(err, obj)
+	cache.del(cacheKey,function(err, obj)
 	{
 		t.deepEqual(obj,
 					{

@@ -70,7 +70,7 @@ function assertIsCache(t,cache)
 	t.ok(typeof cache.put  === 'function');
 	t.ok(typeof cache.inc  === 'function');
 	t.ok(typeof cache.get  === 'function');
-	t.ok(typeof cache.delete === 'function');
+	t.ok(typeof cache.del === 'function');
 }
 
 //TODO

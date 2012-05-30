@@ -1,12 +1,12 @@
 var ironmq  = require('../').IronMQ;
 
-var nock    = require('nock')
-var test    = require('tap').test
+var nock    = require('nock');
+var test    = require('tap').test;
+var con     = require('./constants.js');
 
-var con     = require('./constants.js')
-var token   = con.token
-var proj_id = con.projectId
-var q_name  = con.q_name
+var token   = con.token;
+var proj_id = con.projectId;
+var q_name  = con.queue;
 
 if (con.proxy) {
   var req = nock('http://host.name:443')
